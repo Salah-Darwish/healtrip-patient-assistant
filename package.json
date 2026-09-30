@@ -1,0 +1,18 @@
+{
+  "name": "healtrip-patient-assistant",
+  "version": "1.0.0",
+  "description": "HealTrip AI Patient Decision Assistant - Full-Stack Architecture Prototype",
+  "author": "Salah Darwish <salahdarwish@example.com>",
+  "scripts": {
+    "install:all": "npm install && (cd backend && npm install) && (cd frontend && npm install)",
+    "setup:db": "cd backend && npm run prisma:generate && npm run prisma:push && npm run prisma:seed",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently -n \"API,WEB\" -c \"cyan,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "test": "cd backend && npm run test",
+    "build": "(cd backend && npm run build) && (cd frontend && npm run build)"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
