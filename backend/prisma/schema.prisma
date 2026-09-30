@@ -1,0 +1,97 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Hospital {
+  id                     String    @id @default(cuid())
+  nameEn                 String
+  nameAr                 String
+  cityEn                 String
+  cityAr                 String
+  countryEn              String
+  countryAr              String
+  countryCode            String
+  accreditation          String
+  cardiacCareTier        String
+  hasEmergency24x7       Boolean   @default(true)
+  internationalDeskPhone String
+  emergencyPhone         String
+  website                String
+  descriptionEn          String
+  descriptionAr          String
+  doctors                Doctor[]
+  createdAt              DateTime  @default(now())
+}
+
+model Doctor {
+  id                   String    @id @default(cuid())
+  hospitalId           String
+  hospital             Hospital  @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  nameEn               String
+  nameAr               String
+  titleEn              String
+  titleAr              String
+  specialty            String
+  subSpecialty         String?
+  yearsOfExperience    Int
+  languages            String
+  consultationFeeUsd   Int
+  rating               Float     @default(4.9)
+  reviewsCount         Int       @default(120)
+  acceptsSecondOpinion Boolean   @default(true)
+  isAvailableOnline    Boolean   @default(true)
+  bioEn                String
+  bioAr                String
+  createdAt            DateTime  @default(now())
+}
+
+model Specialty {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  nameEn        String
+  nameAr        String
+  descriptionEn String
+  descriptionAr String
+}
+
+model ChatSession {
+  id             String           @id @default(uuid())
+  language       String           @default("en")
+  patientSummary String?
+  urgencyLevel   String           @default("ROUTINE")
+  status         String           @default("ACTIVE")
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  messages       ChatMessage[]
+  triageAudits   TriageAuditLog[]
+}
+
+model ChatMessage {
+  id                String       @id @default(uuid())
+  sessionId         String
+  session           ChatSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role              String
+  content           String
+  toolCallsJson     String?
+  toolResultsJson   String?
+  grounded          Boolean      @default(true)
+  verifiedEntityIds String?
+  createdAt         DateTime     @default(now())
+}
+
+model TriageAuditLog {
+  id                String      @id @default(uuid())
+  sessionId         String
+  session           ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  rawInput          String
+  redFlags          String
+  urgencyScore      Int
+  actionRecommended String
+  overrodeByRule    Boolean     @default(false)
+  createdAt         DateTime    @default(now())
+}
